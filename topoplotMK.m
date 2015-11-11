@@ -1151,7 +1151,8 @@ if nargs > 2
                     ECOLOR = Value{2};
                 end
                 if length(Value) > 2
-                    EMARKERSIZE2 = Value{3};
+                    EMARKERSIZE = Value{3}; %DG mod Nov 10, 2015
+                    %EMARKERSIZE2 = Value{3};
                 end
                 if length(Value) > 3
                     EMARKERLINEWIDTH = Value{4};
@@ -2157,12 +2158,12 @@ if ~strcmpi(STYLE,'grid')                     % if not plot grid only
             
             for i=mark1chans,
                 hp2 = plot3(y(i),x(i),ELECTRODE_HEIGHT,...
-                    EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
+                    EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'markerfacecolor',ECOLOR,'linewidth',EMARKERLINEWIDTH);
                 set(hp2,'tag',str2lowcase(strtok(labels(i,:)))); %get rid of extra spaces and convert to lowercase
             end
             for i=mark2chans,
                 hp2b = plot3(y(i),x(i),ELECTRODE_HEIGHT,...
-                    EMARKER2,'Color',EMARKER2COLOR,'markerfacecolor',EMARKER2COLOR,'linewidth',EMARKER2LINEWIDTH,'markersize',EMARKERSIZE2);
+                    EMARKER2,'Color',EMARKER2COLOR,'markersize',EMARKERSIZE2,'markerfacecolor',EMARKER2COLOR,'linewidth',EMARKER2LINEWIDTH);
                 set(hp2b,'tag',str2lowcase(strtok(labels(i,:)))); %get rid of extra spaces and convert to lowercase
             end
             for i=1:length(y),
