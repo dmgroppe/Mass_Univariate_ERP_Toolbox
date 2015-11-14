@@ -444,10 +444,10 @@ end
 switch lower(p.Results.method)
     case 'bh'
         VerbReport('FDR control procedure: Benjamini & Hochberg (independent or positive dependency)',1,VERBLEVEL);
-        [h_rej, crit_p, adj_p]=fdr_bh(p_values,p.Results.q,'pdep','no');
+        [h_rej, crit_p, adj_ci_cvrg, adj_p]=fdr_bh(p_values,p.Results.q,'pdep','no');
     case 'by'
         VerbReport('FDR control procedure: Benjamini & Yekutieli (arbitrary dependency)',1,VERBLEVEL);
-        [h_rej, crit_p, adj_p]=fdr_bh(p_values,p.Results.q,'dep','no');
+        [h_rej, crit_p, adj_ci_cvrg, adj_p]=fdr_bh(p_values,p.Results.q,'dep','no');
     case 'bky'
         VerbReport('FDR control procedure: Benjamini, Krieger, & Yekutieli (two-stage)',1,VERBLEVEL);
         [h_rej, crit_p]=fdr_bky(p_values,p.Results.q,'no');
