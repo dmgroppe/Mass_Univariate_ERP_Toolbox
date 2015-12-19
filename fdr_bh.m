@@ -46,7 +46,7 @@
 %   crit_p  - All uncorrected p-values less than or equal to crit_p are 
 %             significant (i.e., their null hypotheses are rejected).  If 
 %             no p-values are significant, crit_p=0.
-%   adj_ci_cvrg - The FCR BH- or BY-adjusted selected 
+%   adj_ci_cvrg - The FCR-adjusted BH- or BY-selected 
 %             confidence interval coverage. For any p-values that 
 %             are significant after FDR adjustment, this gives you the
 %             proportion of coverage (e.g., 0.99) you should use when generating
@@ -107,6 +107,14 @@
 % http://www.cogsci.ucsd.edu/~dgroppe/PUBLICATIONS/mass_uni_preprint1.pdf
 %
 %
+% For a review of FCR-adjusted confidence intervals (CIs) and other techniques 
+% for adjusting CIs for multiple comparisons see:
+%
+%   Groppe, D.M. (in press) Combating the scientific decline effect with 
+% confidence (intervals). Psychophysiology.
+% http://biorxiv.org/content/biorxiv/early/2015/12/10/034074.full.pdf
+%
+%
 % Author:
 % David M. Groppe
 % Kutaslab
@@ -118,6 +126,7 @@
 %
 % 5/7/2010-Added FDR adjusted p-values
 % 5/14/2013- D.H.J. Poot, Erasmus MC, improved run-time complexity
+% 10/2015- Now returns FCR adjusted confidence intervals
 
 function [h, crit_p, adj_ci_cvrg, adj_p]=fdr_bh(pvals,q,method,report)
 
