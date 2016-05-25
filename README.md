@@ -18,3 +18,7 @@ This toolbox was produced by members of the [Kutaslab](http://kutaslab.ucsd.edu/
 ---
 ### Documentation and a tutorial for using the code are available here:
 [http://openwetware.org/wiki/Mass_Univariate_ERP_Toolbox](http://openwetware.org/wiki/Mass_Univariate_ERP_Toolbox)
+
+
+---
+DISCLAIMER: The Mass Univariate ERP toolbox is written and released for research purposes only with no guarantee of suitability for any particular purpose. This software, or data obtained from this software, should not under any circumstances be used for clinical purposes.
