@@ -13,5 +13,8 @@ This toolbox was produced by members of the [Kutaslab](http://kutaslab.ucsd.edu/
 
 [Groppe, D.M., Urbach, T.P., Kutas, M. (2011) Mass univariate analysis of event-related brain potentials/fields I: A critical tutorial review, *Psychophysiology*, 48(12) pp. 1711-1725, DOI: 10.1111/j.1469-8986.2011.01273.x](http://www.cogsci.ucsd.edu/~dgroppe/PUBLICATIONS/mass_uni_preprint1.pdf)
 
+
+
+---
 ### Documentation and a tutorial for using the code are available here:
 [http://openwetware.org/wiki/Mass_Univariate_ERP_Toolbox](http://openwetware.org/wiki/Mass_Univariate_ERP_Toolbox)
