@@ -23,12 +23,21 @@ justname='';
 justpath='';
 n=length(full_file);
 
+%Figure out which path convention is being used
+if ismac || isunix
+    %Mac or Unix OS
+    slash='/';
+else
+    %Windows OS
+    slash='\';
+end
+
 flg=0;
 for a=n:-1:1,
-  if (flg==0) && (full_file(a)~='/')
+  if (flg==0) && (full_file(a)~=slash)
     justname=[full_file(a) justname];
   else
-    if full_file(a)=='/'
+    if full_file(a)==slash
       flg=1;
     end
     justpath=[full_file(a) justpath];
