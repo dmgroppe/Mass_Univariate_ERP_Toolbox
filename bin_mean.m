@@ -1,23 +1,22 @@
-% bin_mn() - Computes the difference waves from two bins and stores the 
-%             difference as a new bin in a GND variable. The difference
-%             wave will be binA-binB.
+% bin_mean() - Computes the mean ERP from two bins and stores it as a new  
+%             bin in a GND variable. The new ERP is simply (binA+binB)/2.
 %             
 % Usage:
-%  >> GND=bin_mn(GND,binA,binB,mn_bindesc,mn_ccode,mn_ccdescr);
+%  >> GND=bin_mean(GND,binA,binB,mn_bindesc,mn_ccode,mn_ccdescr);
 %
 % Required Inputs:
-%   GND    - A GND structure variable.  To create a GND variable 
+%   GND    - A GND structure variable. To create a GND variable 
 %            from Kutaslab ERP files (e.g., *.mas files) use avgs2GND.m.  
 %            To do the same from EEGLAB *.set files use sets2GND.m.
 %            See Mass Univariate ERP Toolbox documentation for detailed  
 %            information about the format of a GND variable. 
 %   binA   - [integer] A bin index. Use the function headinfo.m to see what 
 %            bins are available.
-%   binB   - [integer] A bin index. The difference wave will be binA-binB.
+%   binB   - [integer] A bin index.
 %
 % Optional Inputs:
 %   mn_bindesc - [string] The bin descriptor for the new bin being
-%                 created. {default: 'Bin #-Bin ##', where # is the value
+%                 created. {default: '(Bin #+Bin ##)/2', where # is the value
 %                 binA and ## is the value of binB}
 %   mn_ccode   - [integer] The condition code of the new bin being
 %                 created. Condition codes are specific to Kutaslab data
@@ -34,13 +33,17 @@
 % contain cal pulses and is stored apart from bins in GND variables)
 %
 % Example:
-% >> GND=bin_mn(GND,2,1,'Targets-Standards'); 
+% >> GND=bin_mean(GND,2,1,'Targets+Standards'); 
 %
 % Author:
 % David Groppe
 % Kutaslab, 3/2010
 
 %%%%%%%%%%%%%%%% REVISION LOG %%%%%%%%%%%%%%%%%
+% 11/8/2016-Documentation mistakenly said this function was creating
+% difference waves (rather than averaging). Thanks to Eric Fields for
+% catching this.
+%
 % 3/15/2010-bin_dif command is added to GND variable history
 %
 % 12/9/2010-Original GND variable returned in case of failure (as opposed
@@ -143,7 +146,7 @@ fprintf('<<New bin successfully created>>\n');
 cc=GND.bin_info(neo_bin).condcode;
 fprintf('Condition Code %d: %s\n',cc,GND.condesc{cc});
 fprintf('Bin %d: %s\n',neo_bin,GND.bin_info(neo_bin).bindesc);
-hist_cmd=sprintf('GND=bin_mn(GND,%d,%d,''%s'',%d,''%s'');',binA,binB, ...
+hist_cmd=sprintf('GND=bin_mean(GND,%d,%d,''%s'',%d,''%s'');',binA,binB, ...
     GND.bin_info(neo_bin).bindesc,cc,GND.condesc{cc});
 GND.history{length(GND.history)+1}=hist_cmd;
 GND.saved='no';
