@@ -931,7 +931,7 @@ if strcmp(cmnd_str,'initialize')
     
     % TOPOGRAPHY
     dat.h_topoA=axes('position',topo_ax_dim,'box','off','Parent',uipan); 
-  %??    dat.h_topoA=axes('position',[0.705 .68 .31 .24],'box','off','Parent',uipan); 
+
     sig_chans=[];
     if ~isempty(test_wind) && ~isempty(critical_t),
         %if current time point is in a test window look for channels with
@@ -990,7 +990,7 @@ if strcmp(cmnd_str,'initialize')
     
     % COLOR BAR
     dat.h_cbarA=axes('position',[0.13 .88 .77 .02],'Parent',uipan);
-    cbar(dat.h_cbarA);
+    cbarDG(dat.h_cbarA);
     absmx=round(dat.absmxA*100)/100;
     set(gca,'xticklabel',[-absmx 0 absmx],'fontsize',cbar_fontsize);
     h_cbar_title=title(cbar_title);
@@ -1065,7 +1065,7 @@ if strcmp(cmnd_str,'initialize')
     
     % COLOR BAR
     dat.h_cbarB=axes('position',[0.13 .88 .77 .02],'Parent',uipan);
-    cbar(dat.h_cbarB);
+    cbarDG(dat.h_cbarB);
     absmx=round(dat.absmxB*100)/100;
     set(gca,'xticklabel',[-absmx 0 absmx],'fontsize',cbar_fontsize);
     h_cbar_title=title(cbar_title);
@@ -1917,7 +1917,7 @@ set(dat.h_timeB,'ButtonDownFcn',bdf_code);
 dat.absmxB=max(max(abs(dat.showingB(:,dat.start_pt:dat.end_pt))));
 axes(dat.h_cbarB);
 cla;
-cbar(dat.h_cbarB);
+cbarDG(dat.h_cbarB);
 absmx=round(dat.absmxB*100)/100;
 set(gca,'xticklabel',[-absmx 0 absmx]);
 h_cbar_title=title(cbar_title);
@@ -1993,7 +1993,7 @@ if redrawA,
     dat.absmxA=max(max(abs(dat.showingA(:,dat.start_pt:dat.end_pt))));
     axes(dat.h_cbarA);
     cla;
-    cbar(dat.h_cbarA);
+    cbarDG(dat.h_cbarA);
     absmx=round(dat.absmxA*100)/100;
     set(gca,'xticklabel',[-absmx 0 absmx]);
     h_cbar_title=title(cbar_title);
