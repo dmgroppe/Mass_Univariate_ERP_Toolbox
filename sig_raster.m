@@ -71,6 +71,8 @@
 %                     limits are +/- the maximum absolute value being shown.
 %                     This option is useful for making multiple sig_raster
 %                     plots on the same scale.
+%  fontsize         - [integer] Fontsize of tick mark text. Other text
+%                     (e.g., axis labels) are a function of this. {default: 12} 
 %  verblevel        - An integer specifiying the amount of information you want
 %                     this function to provide about what it is doing during runtime.
 %                     Options are:
@@ -133,6 +135,8 @@
 %
 % 3/5/2012-'rgb' color option, 'units' option, and 'scale_limits' added.
 % h_ax output added.
+%
+% 12/7/2016-Made compatible with MATLAB 2014+. Fontsize argument added.
 
 %%%%%%%%%%%%%%%% FUTURE WORK %%%%%%%%%%%%%%%%%
 % -When you click on figure, box with time and electrode appear behind edges
@@ -156,6 +160,7 @@ p.addParamValue('lr_sym',0,@(x) isnumeric(x) || ischar(x));
 p.addParamValue('verblevel',[],@(x) isnumeric(x) && (length(x)==1));
 p.addParamValue('scale_limits',[],@(x) isnumeric(x) && (length(x)==2));
 p.addParamValue('unused_color',[1 1 1]*.7,@(x) isnumeric(x) && (length(x)==3)); % this option isn't all that useful actually
+p.addParamValue('fontsize',12,@(x) isnumeric(x) && (length(x)==1));
 
 p.parse(GND_GRP_specGND_or_fname,test_id,varargin{:});
 
@@ -166,12 +171,11 @@ else
     VERBLEVEL=p.Results.verblevel;
 end
 
-%use_color=str2bool(p.Results.use_color);
 use_color=p.Results.use_color;
-if ~verLessThan('matlab','8.4') && strcmpi(use_color,'rgb')
-    warning('rbg option for use_color is not yet supported for your version of Matlab. Reverting to grey scale. Try an older version of Matlab.');
-    use_color='n';
-end
+% ?? if ~verLessThan('matlab','8.4') && strcmpi(use_color,'rgb')
+%     warning('rbg option for use_color is not yet supported for your version of Matlab. Reverting to grey scale. Try an older version of Matlab.');
+%     use_color='n';
+% end
 plot_vert_lines=str2bool(p.Results.plot_vert_lines);
 lr_sym=str2bool(p.Results.lr_sym);
 
@@ -597,10 +601,12 @@ if strcmpi(use_color,'rb'),
     %skipped rows/columns=grey, nonsig=white, +sig=red, -sig=blue
     h_img=imagesc(img,[-1 1]);colormap([0 0 1; .5 .5 .5; 1 1 1; 1 0 0]);
 elseif strcmpi(use_color,'rgb')
-    cmap=colormap('jet');
-    %cmap(32,:)=[1 1 1]*.7; %set 0 vals to grey
+    if verLessThan('matlab','8.4')
+        cmap=colormap('jet');
+    else
+        cmap=colormap('parula');
+    end
     zero_color=cmap(33,:);
-    %%cmap(33,:)=[1 1 1]*.7; %set 0 vals to grey ORIG WORKS
     cmap(33,:)=p.Results.unused_color; %set 0 vals to grey
     colormap(cmap);
     abs_mx=max(max(abs(img)));
@@ -612,6 +618,7 @@ elseif strcmpi(use_color,'rgb')
 else
     h_img=imagesc(img,[-1 1]);colormap([0 0 0; .6 .6 .6; 1 1 1]);
 end
+set(gca,'fontsize',p.Results.fontsize);
 h_ax(1)=gca;
 if freq_domain,
     bdfcn=['Cp = get(gca,''CurrentPoint''); ' ...
@@ -639,10 +646,10 @@ if freq_domain,
 else
     h=xlabel('Time (ms)');
 end
-set(h,'fontsize',12,'fontweight','bold');
+set(h,'fontsize',p.Results.fontsize+2,'fontweight','bold');
 
 h=ylabel('Electrode');
-set(h,'fontsize',12,'fontweight','bold');
+set(h,'fontsize',p.Results.fontsize+2,'fontweight','bold');
 
 
 if isfield(GND,'bin_info')
@@ -650,7 +657,7 @@ if isfield(GND,'bin_info')
 else
     h=title(['Bin ' int2str(use_bin) ': ' GND.bindesc{use_bin}]);
 end
-set(h,'fontsize',14,'fontweight','bold');
+set(h,'fontsize',p.Results.fontsize+3,'fontweight','bold');
 
 hold on;
 v=axis;
@@ -755,8 +762,11 @@ end
 
 %% Add Colorbar (if using RGB)
 if strcmpi(use_color,'rgb')
-    cbar_ax=colorbar;
-    axes(cbar_ax);
+    cbar_ax=cbarDG();
+    set(gca,'xtick',[]);
+    if verLessThan('matlab','8.4')
+        axes(cbar_ax);
+    end
     hold on;
     v=axis;
     dlt=2*abs_mx/length(colormap);
@@ -768,14 +778,22 @@ if strcmpi(use_color,'rgb')
     rngY=v(4)-v(3);
     if strcmpi(p.Results.units,'t')
         ht=text(v(2)+rngX*.8,rngY*.005,'t');
-        %ht=ylabel('t');
-        set(ht,'fontsize',14,'rotation',0,'fontweight','bold', ...
-            'horizontalalignment','left','verticalalignment','middle');
+        if verLessThan('matlab','8.4')
+            set(ht,'fontsize',p.Results.fontsize+2,'rotation',0,'fontweight','bold', ...
+                'horizontalalignment','left','verticalalignment','middle');
+        else
+            set(ht,'fontsize',p.Results.fontsize,'rotation',0, ...
+                'horizontalalignment','left','verticalalignment','middle');
+        end
     else
         ht=text(v(2)+rngX*.8,rngY*.005,'\muV');
-        %ht=ylabel('t');
-        set(ht,'fontsize',14,'rotation',0,'fontweight','bold', ...
-            'horizontalalignment','left','verticalalignment','middle');
+        if verLessThan('matlab','8.4')
+            set(ht,'fontsize',p.Results.fontsize+2,'rotation',0,'fontweight','bold', ...
+                'horizontalalignment','left','verticalalignment','middle');
+        else
+            set(ht,'fontsize',p.Results.fontsize,'rotation',0, ...
+                'horizontalalignment','left','verticalalignment','middle');
+        end
     end
     h_ax(2)=cbar_ax;
 end
