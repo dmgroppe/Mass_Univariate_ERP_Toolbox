@@ -90,6 +90,7 @@ p.addParamValue('title_on',1,@(x) isnumeric(x) && (length(x)==1));
 p.addParamValue('one_scale',[],@(x) isnumeric(x) && (length(x)==1));
 p.addParamValue('verblevel',[],@(x) isnumeric(x) && (length(x)==1));
 p.addParamValue('scale_limits',[],@(x) isnumeric(x) && (length(x)==2));
+p.addParamValue('fontsize',12,@(x) isnumeric(x) && (length(x)==1));
 
 p.parse(GND_GRP_specGND_or_fname,test_id,varargin{:});
 
@@ -259,10 +260,15 @@ for a=1:n_topos,
     end
     
     hh=title(sprintf(lab_form,time_wind(1),time_wind(2)));
+    set(hh,'fontsize',p.Results.fontsize);
     if ~one_scale,
         hcb=colorbar;
+        set(gca,'fontsize',p.Results.fontsize);
         hy=ylabel(hcb,units);
-        set(hy,'rotation',0,'verticalalignment','middle','position',[4.9+n_topos*.2 0.03 1.0001]);
+        set(hy,'rotation',0,'verticalalignment','middle','position',[2 0 0], ...
+            'fontsize',p.Results.fontsize);
+        %set(hy,'rotation',0,'verticalalignment','middle','position',[4.9+n_topos*.2 0.03 1.0001]);
+        %2.0310    0.0000         0
     end
 end
 
