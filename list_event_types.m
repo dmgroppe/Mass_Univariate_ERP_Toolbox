@@ -78,6 +78,21 @@ else
     %Epoched data
     fprintf('set file contains epoched EEG data.\n');
     n_ep=length(EEG.epoch);
+    
+    % Check for empty epochs. Remove them if found.
+    non_empty_ids=[];
+    for a=1:n_ep,
+        if ~isempty(EEG.epoch(a).event)
+            non_empty_ids=[non_empty_ids a];
+        end
+    end
+    n_ep_orig=n_ep;
+    EEG.epoch=EEG.epoch(non_empty_ids);
+    n_ep=length(EEG.epoch);
+    if n_ep_orig>n_ep,
+        warning(sprintf('%d empty epoch(s) removed',n_ep_orig-n_ep));
+    end
+    
     n_types=0;
     types=[];
     type_count=[];

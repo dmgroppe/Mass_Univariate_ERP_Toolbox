@@ -26,11 +26,12 @@
 %                      Only necessary if a filename template is given as
 %                      the input to gui_infiles_or_tmplt.
 %
-%   bsln             - [vector] A pair of numbers (in milliseconds)
+%   bsln             - [vector or NaN] A pair of numbers (in milliseconds)
 %                      specifying the start and end times of the ERP baseline
-%                      window.  The mean voltage in the baseline window will
-%                      be removed from each ERP. {default: use all time
-%                      points before time 0).
+%                      window or NaN.  If NaN, data are not baselined.  
+%                      Otherwise, the mean voltage in the baseline window 
+%                      will be removed from each ERP. {default: use all time
+%                      points before time 0}.
 %
 %   use_bins         - [integer vector] A set of integers specifying which
 %                      bins to import into MATLAB.  If not specified, all
@@ -102,6 +103,7 @@
 %
 % 4/4/2011: Made compatible with Windows.
 %
+% 1/10/2017: NaN can now be the baseline to avoid an baselining of EEG data
 
 %%%%%%%%%%%%%%%% Future Work  %%%%%%%%%%%%%%%%%
 %
@@ -122,7 +124,7 @@ p=inputParser;
 p.addRequired('gui_infiles_or_tmplt',@(x) ischar(x) || iscell(x));
 p.addParamValue('locfile',[],@ischar);
 p.addParamValue('sub_ids',[],@isnumeric);
-p.addParamValue('bsln',[],@(x) isnumeric(x) && length(x)==2);
+p.addParamValue('bsln',[],@(x) sum(isnan(x)) || (isnumeric(x) && length(x)==2));
 p.addParamValue('exp_name','An Experiment',@ischar);
 p.addParamValue('use_bins',[],@isnumeric);
 p.addParamValue('exclude_chans',[],@(x) ischar(x) || iscell(x));
@@ -553,7 +555,9 @@ for filenum=1:n_infiles,
     GND.indiv_art_ics{filenum}=NaN;
     
     %baseline data (if not already baselined by ics_removed)
-    if ~isempty(GND.bsln_wind),
+    if isnan(GND.bsln_wind)
+        fprintf('NOT baselining data.\n');
+    elseif ~isempty(GND.bsln_wind),
         bsln_pts(1)=find_tpt(GND.bsln_wind(1),ERP.times);
         bsln_pts(2)=find_tpt(GND.bsln_wind(2),ERP.times);
         if VERBLEVEL>=2,

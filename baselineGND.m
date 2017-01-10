@@ -47,7 +47,10 @@
 
 % Changes:
 % 8/23/2012 - NaN now a possible value for bsln_wind to avoid any
-% baselining
+% baselining. GND is not changed at all when NaN is the baseline window.
+%
+% 1/10/2017 - ERP grand averages and t-scores are still computed when NaN
+% is the baseline window.
 
 function GND=baselineGND(GND,bsln_wind,verblevel)
 
@@ -55,8 +58,7 @@ if nargin<2
     bsln_wind=[];
 elseif ~isempty(bsln_wind),
     if isnan(bsln_wind)
-        fprintf('Not baselining data.');
-        return; 
+        fprintf('Not baselining data.\n');
     else
         if length(bsln_wind)~=2,
             error('Argument bsln_wind needs to be a two element vector.');
@@ -95,47 +97,49 @@ if ~isempty(GND.t_tests),
 end
 
 %find baseline window time points
-if ~isempty(bsln_wind),
-   bsln_tpt(1)=find_tpt(bsln_wind(1),GND.time_pts);
-   bsln_tpt(2)=find_tpt(bsln_wind(2),GND.time_pts);
-   if VERBLEVEL>1,
-      fprintf('Baselining data from %d to %d ms (that''s time point %d to %d).\n', ...
-          GND.time_pts(bsln_tpt(1)),GND.time_pts(bsln_tpt(2)),bsln_tpt(1),bsln_tpt(2));
-   end
-else
-    bsln_tpt=[];
-    if VERBLEVEL,
-        ids=find(GND.time_pts<0);
-        if isempty(ids),
-            error('Attempted to use default baseline of all time points before 0. However, all time points in these data are after 0.');
-        else
-            bsln_tpt(1)=ids(1);
-            bsln_tpt(2)=ids(end);
-            if VERBLEVEL>1,
-                fprintf('Using default baseline of all time points before 0.\n');
-                fprintf('That''s from %d to %d ms (time points %d to %d).\n', ...
-                    GND.time_pts(bsln_tpt(1)),GND.time_pts(bsln_tpt(2)), ...
-                    bsln_tpt(1),bsln_tpt(2));
+[n_chan, n_tpt, n_bin, n_sub]=size(GND.indiv_erps);
+if ~isnan(bsln_wind),
+    if ~isempty(bsln_wind),
+        bsln_tpt(1)=find_tpt(bsln_wind(1),GND.time_pts);
+        bsln_tpt(2)=find_tpt(bsln_wind(2),GND.time_pts);
+        if VERBLEVEL>1,
+            fprintf('Baselining data from %d to %d ms (that''s time point %d to %d).\n', ...
+                GND.time_pts(bsln_tpt(1)),GND.time_pts(bsln_tpt(2)),bsln_tpt(1),bsln_tpt(2));
+        end
+    else
+        bsln_tpt=[];
+        if VERBLEVEL,
+            ids=find(GND.time_pts<0);
+            if isempty(ids),
+                error('Attempted to use default baseline of all time points before 0. However, all time points in these data are after 0.');
+            else
+                bsln_tpt(1)=ids(1);
+                bsln_tpt(2)=ids(end);
+                if VERBLEVEL>1,
+                    fprintf('Using default baseline of all time points before 0.\n');
+                    fprintf('That''s from %d to %d ms (time points %d to %d).\n', ...
+                        GND.time_pts(bsln_tpt(1)),GND.time_pts(bsln_tpt(2)), ...
+                        bsln_tpt(1),bsln_tpt(2));
+                end
             end
         end
     end
-end
-
-%baseline individual ERPs
-[n_chan, n_tpt, n_bin, n_sub]=size(GND.indiv_erps);
-bsln_tpts=bsln_tpt(1):bsln_tpt(2);
-for s=1:n_sub,
-    if VERBLEVEL>1,
-       fprintf('Baselining data from Participant #%d (%s).\n',s,GND.indiv_subnames{s});
-    end
-    for b=1:n_bin,
-        GND.indiv_erps(:,:,:,s)=reshape(rmbase(GND.indiv_erps(:,:,:,s), ...
-            n_tpt,bsln_tpts),n_chan,n_tpt,n_bin);
-    end
-    if ~isempty(GND.cals),
-        cal_size=size(GND.cals.indiv_cals);
-        GND.cals.indiv_cals=reshape(rmbase(GND.cals.indiv_cals, ...
-            cal_size(2),bsln_tpts),cal_size(1),cal_size(2),n_sub);
+    
+    %baseline individual ERPs
+    bsln_tpts=bsln_tpt(1):bsln_tpt(2);
+    for s=1:n_sub,
+        if VERBLEVEL>1,
+            fprintf('Baselining data from Participant #%d (%s).\n',s,GND.indiv_subnames{s});
+        end
+        for b=1:n_bin,
+            GND.indiv_erps(:,:,:,s)=reshape(rmbase(GND.indiv_erps(:,:,:,s), ...
+                n_tpt,bsln_tpts),n_chan,n_tpt,n_bin);
+        end
+        if ~isempty(GND.cals),
+            cal_size=size(GND.cals.indiv_cals);
+            GND.cals.indiv_cals=reshape(rmbase(GND.cals.indiv_cals, ...
+                cal_size(2),bsln_tpts),cal_size(1),cal_size(2),n_sub);
+        end
     end
 end
 
@@ -156,7 +160,11 @@ if ~isempty(GND.cals),
     GND.cals.grand_cals=mean(GND.cals.indiv_cals,3);
 end
 
-GND.bsln_wind=[GND.time_pts(bsln_tpt(1)) GND.time_pts(bsln_tpt(2))];
+if isnan(bsln_wind),
+    GND.bsln_wind=NaN;
+else
+    GND.bsln_wind=[GND.time_pts(bsln_tpt(1)) GND.time_pts(bsln_tpt(2))];
+end
 
 GND.saved='no';
 

@@ -649,7 +649,6 @@ for filenum=1:n_infiles,
         
         EEG.data=rmbase(EEG.data,n_pts,bsln_pts(1):bsln_pts(2));
         EEG.data=reshape(EEG.data,n_EEG_chans,n_pts,n_epochs);
-        
     end
     
     
