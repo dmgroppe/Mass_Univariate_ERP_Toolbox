@@ -477,7 +477,8 @@ end
 
 %Initialize variables
 n_blank=(n_right>0)+(n_left>0)+(n_midline>0)-1;
-if ~strcmpi(use_color,'n'),
+%if ~strcmpi(use_color,'n'),
+if strcmpi(use_color,'rb'),
     img=-.25*ones(n_use_chans+n_blank,n_show_tpts);%makes skipped lines grey (non-sig rectangles are white)
 else
     img=zeros(n_use_chans+n_blank,n_show_tpts); %makes skipped lines grey
@@ -608,10 +609,15 @@ elseif strcmpi(use_color,'rgb')
     end
     zero_color=cmap(33,:);
     cmap(33,:)=p.Results.unused_color; %set 0 vals to grey
+    %cmap(32,:)=p.Results.unused_color;
     colormap(cmap);
     abs_mx=max(max(abs(img)));
     if isempty(p.Results.scale_limits)
-        h_img=imagesc(img.*mask,[-1 1]*abs_mx);
+        masked_img=img.*mask;
+        masked_img(masked_img==0)=1e-10; %This is necessary to make masked 
+        % values slightly greater than zero, since cmap has an even # of 
+        % entries and we need cmap(33,:) to map to 0. 
+        h_img=imagesc(masked_img,[-1 1]*abs_mx);
     else
         h_img=imagesc(img.*mask,p.Results.scale_limits);
     end
