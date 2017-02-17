@@ -137,6 +137,10 @@
 % h_ax output added.
 %
 % 12/7/2016-Made compatible with MATLAB 2014+. Fontsize argument added.
+%
+% 2/17/2017-Can now deal with chanlocs that lack theta and a radius fields.
+% (Thanks Elizabeth Kirkham.)
+% 
 
 %%%%%%%%%%%%%%%% FUTURE WORK %%%%%%%%%%%%%%%%%
 % -When you click on figure, box with time and electrode appear behind edges
@@ -311,10 +315,15 @@ n_use_chans=length(use_chans);
 
 % Standardize theta to -180<theta<=180 degrees
 for c=1:n_use_chans,
-    theta=mod(GND.chanlocs(use_chans(c)).theta,360);
-    if isempty(theta),
+    if ~isfield(GND.chanlocs(c),'theta'),
         watchit(sprintf('Channel #%d (Label: %s) does not have a theta coordinate. To produce raster, I''m assigning it temporary coordinate of: theta=0.',c,GND.chanlocs(use_chans(c)).labels));
         theta=0;
+    else
+        theta=mod(GND.chanlocs(use_chans(c)).theta,360);
+        if isempty(theta),
+            watchit(sprintf('Channel #%d (Label: %s) does not have a theta coordinate. To produce raster, I''m assigning it temporary coordinate of: theta=0.',c,GND.chanlocs(use_chans(c)).labels));
+            theta=0;
+        end
     end
     if theta>180,
         theta=theta-360;
@@ -323,9 +332,14 @@ for c=1:n_use_chans,
     end
     GND.chanlocs(use_chans(c)).theta=theta;
     
-    if isempty(GND.chanlocs(use_chans(c)).radius),
+    if ~isfield(GND.chanlocs(c),'radius'),
         GND.chanlocs(use_chans(c)).radius=2;
         watchit(sprintf('Channel #%d (Label: %s) does not have a radius coordinate. To produce raster, I''m assigning it temporary coordinate of: radius=2.',c,GND.chanlocs(use_chans(c)).labels));
+    else
+        if isempty(GND.chanlocs(use_chans(c)).radius),
+            GND.chanlocs(use_chans(c)).radius=2;
+            watchit(sprintf('Channel #%d (Label: %s) does not have a radius coordinate. To produce raster, I''m assigning it temporary coordinate of: radius=2.',c,GND.chanlocs(use_chans(c)).labels));
+        end
     end
 end
 
@@ -609,7 +623,7 @@ elseif strcmpi(use_color,'rgb')
     end
     zero_color=cmap(33,:);
     cmap(33,:)=p.Results.unused_color; %set 0 vals to grey
-    %cmap(32,:)=p.Results.unused_color;
+    %     cmap(32,:)=p.Results.unused_color;
     colormap(cmap);
     abs_mx=max(max(abs(img)));
     if isempty(p.Results.scale_limits)
