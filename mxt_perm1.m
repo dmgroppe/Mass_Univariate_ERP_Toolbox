@@ -151,16 +151,21 @@ if nargin<5,
 end
 
 %Get random # generator state
-if verLessThan('matlab','8.1')
-    defaultStream=RandStream.getDefaultStream; 
+if verLessThan('matlab','7.6')
+    watchit('Your version of MATLAB is too old to seed random number generator. You will not be able to exactly reproduce test results.');
+    seed_state=NaN;
 else
-    defaultStream=RandStream.getGlobalStream;
-end
-if (nargin<6) || isempty(seed_state),
-    %Store state of random number generator
-    seed_state=defaultStream.State;
-else
-    defaultStream.State=seed_state; %reset random number generator to saved state
+    if verLessThan('matlab','8.1')
+        defaultStream=RandStream.getDefaultStream;
+    else
+        defaultStream=RandStream.getGlobalStream;
+    end
+    if (nargin<6) || isempty(seed_state),
+        %Store state of random number generator
+        seed_state=defaultStream.State;
+    else
+        defaultStream.State=seed_state; %reset random number generator to saved state
+    end
 end
 
 if (nargin<7),
