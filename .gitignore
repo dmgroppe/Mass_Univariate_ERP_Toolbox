@@ -1,4 +1,8 @@
 *.m~
 .DS_Store
 TESTING
+<<<<<<< Updated upstream
 FILE_EXCHANGE
+=======
+TUTORIAL_PDFS
+>>>>>>> Stashed changes
