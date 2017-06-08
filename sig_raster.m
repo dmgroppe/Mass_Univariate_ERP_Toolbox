@@ -72,7 +72,11 @@
 %                     This option is useful for making multiple sig_raster
 %                     plots on the same scale.
 %  fontsize         - [integer] Fontsize of tick mark text. Other text
-%                     (e.g., axis labels) are a function of this. {default: 12} 
+%                     (e.g., axis labels) are a function of this. {default: 12}
+%  mask_opacity     - [0<=scalar<=1] The degree to which the grey masking
+%                     of statistically insignificant varialbles will be
+%                     transparent. 0=fully transparent. 1=fully opaque.
+%                     {default: 1}
 %  verblevel        - An integer specifiying the amount of information you want
 %                     this function to provide about what it is doing during runtime.
 %                     Options are:
@@ -165,6 +169,7 @@ p.addParamValue('verblevel',[],@(x) isnumeric(x) && (length(x)==1));
 p.addParamValue('scale_limits',[],@(x) isnumeric(x) && (length(x)==2));
 p.addParamValue('unused_color',[1 1 1]*.7,@(x) isnumeric(x) && (length(x)==3)); % this option isn't all that useful actually
 p.addParamValue('fontsize',12,@(x) isnumeric(x) && (length(x)==1));
+p.addParamValue('mask_opacity',1,@(x) isnumeric(x) && (length(x)==1)); 
 
 p.parse(GND_GRP_specGND_or_fname,test_id,varargin{:});
 
@@ -176,10 +181,6 @@ else
 end
 
 use_color=p.Results.use_color;
-% ?? if ~verLessThan('matlab','8.4') && strcmpi(use_color,'rgb')
-%     warning('rbg option for use_color is not yet supported for your version of Matlab. Reverting to grey scale. Try an older version of Matlab.');
-%     use_color='n';
-% end
 plot_vert_lines=str2bool(p.Results.plot_vert_lines);
 lr_sym=str2bool(p.Results.lr_sym);
 
@@ -621,19 +622,18 @@ elseif strcmpi(use_color,'rgb')
     else
         cmap=colormap('parula');
     end
-    zero_color=cmap(33,:);
-    cmap(33,:)=p.Results.unused_color; %set 0 vals to grey
-    %     cmap(32,:)=p.Results.unused_color;
     colormap(cmap);
     abs_mx=max(max(abs(img)));
     if isempty(p.Results.scale_limits)
-        masked_img=img.*mask;
-        masked_img(masked_img==0)=1e-10; %This is necessary to make masked 
+        %masked_img=img.*mask;
+        %masked_img(masked_img==0)=1e-10; %This is necessary to make masked 
         % values slightly greater than zero, since cmap has an even # of 
         % entries and we need cmap(33,:) to map to 0. 
-        h_img=imagesc(masked_img,[-1 1]*abs_mx);
+        %h_img=imagesc(masked_img,[-1 1]*abs_mx);
+        h_img=imagesc(img,[-1 1]*abs_mx);
     else
-        h_img=imagesc(img.*mask,p.Results.scale_limits);
+        %h_img=imagesc(img.*mask,p.Results.scale_limits);
+        h_img=imagesc(img,p.Results.scale_limits);
     end
 else
     h_img=imagesc(img,[-1 1]);colormap([0 0 0; .6 .6 .6; 1 1 1]);
@@ -685,6 +685,34 @@ v=axis;
 %under imagesc
 h=plot([1 1]*v(2),v(3:4));
 set(h,'color',[1 1 1]*.6);
+
+
+%% Mask non-significant squares if using rgb
+if strcmpi(use_color,'rgb'),
+    [n_x, n_y]=size(img);
+    % Fill in blank rows that divide different groups of electrodes
+    for x=skipped,
+        hp=fill([0 n_y+.5 n_y+.5 0],[-0.5 -0.5 0.5 0.5]+x,[1 1 1]*.78);
+        set(hp,'linestyle','none');
+    end
+    for x=1:n_x,
+        if ~ismember(x,skipped),
+            for y=1:n_y,
+                if mask(x,y)==0,
+                    %plot(y,x,'m*');
+                    hp=fill([-0.5 0.5 0.5 -0.5]+y,[-0.5 -0.5 0.5 0.5]+x,[1 1 1]*.78);
+                    set(hp,'facealpha',p.Results.mask_opacity,'linestyle','none');
+                else
+                    % We need to draw a box around non-masked values to so
+                    % that box edges are visible (otherwise they get
+                    % covered up by adjacent masked boxes)
+                    hp=fill([-0.5 0.5 0.5 -0.5]+y,[-0.5 -0.5 0.5 0.5]+x,[1 1 1]*.78);
+                    set(hp,'facealpha',0,'linestyle','none');
+                end
+            end
+        end
+    end
+end 
 
 %horizontal lines
 show_times=GND.time_pts(show_tpts);
@@ -780,24 +808,20 @@ else
 end
 
 
-%% Add Colorbar (if using RGB)
-if strcmpi(use_color,'rgb')
+    
+%% Draw colorbar is using rgb
+if strcmpi(use_color,'rgb'),
     cbar_ax=cbarDG();
     set(gca,'xtick',[]);
     if verLessThan('matlab','8.4')
         axes(cbar_ax);
     end
-    hold on;
-    v=axis;
-    dlt=2*abs_mx/length(colormap);
-    hf=fill([v(1) v(1) v(2) v(2)],[0 dlt dlt 0],zero_color); % this fills in the gap in the colorbar that is made to keep grey for non-significant cells
-    set(hf,'linestyle','none');
     v=axis;
     axis(v);
     rngX=v(2)-v(1);
     rngY=v(4)-v(3);
     if strcmpi(p.Results.units,'t')
-        ht=text(v(2)+rngX*.8,rngY*.005,'t');
+        ht=text(v(2)+rngX*.8,mean(v(3:4)),'t');
         if verLessThan('matlab','8.4')
             set(ht,'fontsize',p.Results.fontsize+2,'rotation',0,'fontweight','bold', ...
                 'horizontalalignment','left','verticalalignment','middle');
@@ -817,6 +841,7 @@ if strcmpi(use_color,'rgb')
     end
     h_ax(2)=cbar_ax;
 end
+
 
 %
 %% %%%%%%%%%%%%%%%%%%%%% function orderofmag() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
