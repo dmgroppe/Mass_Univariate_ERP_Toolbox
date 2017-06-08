@@ -702,17 +702,11 @@ if strcmpi(use_color,'rgb'),
                     %plot(y,x,'m*');
                     hp=fill([-0.5 0.5 0.5 -0.5]+y,[-0.5 -0.5 0.5 0.5]+x,[1 1 1]*.78);
                     set(hp,'facealpha',p.Results.mask_opacity,'linestyle','none');
-                else
-                    % We need to draw a box around non-masked values to so
-                    % that box edges are visible (otherwise they get
-                    % covered up by adjacent masked boxes)
-                    hp=fill([-0.5 0.5 0.5 -0.5]+y,[-0.5 -0.5 0.5 0.5]+x,[1 1 1]*.78);
-                    set(hp,'facealpha',0,'linestyle','none');
                 end
             end
         end
     end
-end 
+end
 
 %horizontal lines
 show_times=GND.time_pts(show_tpts);
