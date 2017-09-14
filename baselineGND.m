@@ -98,7 +98,7 @@ end
 
 %find baseline window time points
 [n_chan, n_tpt, n_bin, n_sub]=size(GND.indiv_erps);
-if isempty(bsln_wind) || ~isnan(bsln_wind),
+if isempty(bsln_wind) || sum(isnan(bsln_wind))==0,
     if ~isempty(bsln_wind),
         bsln_tpt(1)=find_tpt(bsln_wind(1),GND.time_pts);
         bsln_tpt(2)=find_tpt(bsln_wind(2),GND.time_pts);
