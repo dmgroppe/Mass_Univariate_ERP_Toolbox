@@ -19,6 +19,9 @@ This toolbox was produced by members of the [Kutaslab](http://kutaslab.ucsd.edu/
 ### Documentation and a tutorial for using the code are available here:
 [http://openwetware.org/wiki/Mass_Univariate_ERP_Toolbox](http://openwetware.org/wiki/Mass_Univariate_ERP_Toolbox)
 
+---
+### Extensions:
+Eric Fields has extended this toolbox via his [Factorial Mass Univariate ERP Toolbox](https://github.com/ericcfields/FMUT) (FMUT). The FMUT implements mass univariate statistics for ANOVA-based ERP analyses.
 
 ---
 DISCLAIMER: The Mass Univariate ERP toolbox is written and released for research purposes only with no guarantee of suitability for any particular purpose. This software, or data obtained from this software, should not under any circumstances be used for clinical purposes.
