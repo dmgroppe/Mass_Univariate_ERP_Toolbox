@@ -1572,6 +1572,14 @@ if ~strcmpi(STYLE,'grid')                     % if not plot grid only
             error('emarker2 not defined for style ''blank'' - use marking channel numbers in place of data');
         else % mark1chans and mark2chans are subsets of pltchans for markers 1 and 2
             [tmp1 mark1chans tmp2] = setxor(pltchans,EMARKER2CHANS);
+            % DG add start
+            % I had to add this becuase setxor could return an empty array
+            % that had a single row, which caused an error later in the
+            % code
+            if isempty(mark1chans)
+               mark1chans=[]; 
+            end
+            % DG add stop
             [tmp3 tmp4 mark2chans] = intersect(EMARKER2CHANS,pltchans);
         end
     end
@@ -2155,7 +2163,6 @@ if ~strcmpi(STYLE,'grid')                     % if not plot grid only
                 mark2chans=mark2chans';
             end
             % DG added stop
-            
             for i=mark1chans,
                 hp2 = plot3(y(i),x(i),ELECTRODE_HEIGHT,...
                     EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'markerfacecolor',ECOLOR,'linewidth',EMARKERLINEWIDTH);
