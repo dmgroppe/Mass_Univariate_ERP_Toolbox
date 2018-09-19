@@ -1574,7 +1574,7 @@ if ~strcmpi(STYLE,'grid')                     % if not plot grid only
             [tmp1 mark1chans tmp2] = setxor(pltchans,EMARKER2CHANS);
             % DG add start
             % I had to add this becuase setxor could return an empty array
-            % that had a single row, which caused an error later in the
+            % that had a single column, which caused an error later in the
             % code
             if isempty(mark1chans)
                mark1chans=[]; 
