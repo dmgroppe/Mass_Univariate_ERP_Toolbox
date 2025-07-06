@@ -17,7 +17,7 @@ This toolbox was produced by members of the [Kutaslab](http://kutaslab.ucsd.edu/
 
 ---
 ### Documentation and a tutorial for using the code are available here:
-[http://openwetware.org/wiki/Mass_Univariate_ERP_Toolbox](http://openwetware.org/wiki/Mass_Univariate_ERP_Toolbox)
+[Mass Univariate ERP Toolbox Website](https://web.archive.org/web/20250214093450/http://openwetware.org/wiki/Mass_Univariate_ERP_Toolbox)
 
 ---
 ### Extensions:
